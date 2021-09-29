@@ -1,5 +1,7 @@
 output/
 run_info.log
+*.pdf
+*.h5
 *.txt
 *.exe
 *.xlsx
