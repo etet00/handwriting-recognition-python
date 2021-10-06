@@ -4,6 +4,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import SGD
 import matplotlib.pyplot as plt
+from show_image import show_image
+
 
 # mnist = tf.keras.datasets.mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()  # 載入 MNIST 手寫數字資料
@@ -35,8 +37,8 @@ history = model.fit(x_train_flat, y_train_encoding, batch_size=100, epochs=20)
 scores = model.evaluate(x_test_flat, y_test_encoding)
 print("準確率", scores[1])
 
-model.save("handwriting_model.h5")
-model.save_weights("handwriting_weight.h5")
+# model.save("handwriting_model.h5")
+# model.save_weights("handwriting_weight.h5")
 
 plt.figure(figsize=(8, 8))
 plt.plot(history.history["accuracy"], "r", label="訓練準確率")
@@ -44,8 +46,10 @@ plt.plot(history.history["accuracy"], "r", label="訓練準確率")
 plt.savefig("accuracy.pdf")
 
 # 預測
-predictions = model.predict_classes(x_test_flat)
+predictions = model.predict(x_test_flat)
 
+# 顯示結果
+show_image(x_test, y_test, predictions, start_id=9, num=10)
 
 # model.fit(x_train, y_train, batch_size=10, validation_split=0.2, epochs=20)
 
