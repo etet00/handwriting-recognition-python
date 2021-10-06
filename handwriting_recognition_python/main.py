@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 (x_train, y_train), (x_test, y_test) = mnist.load_data()  # 載入 MNIST 手寫數字資料
 
 # 將寬高各 28 個像素的圖壓縮成一維陣列
-x_train = x_train.reshape(60000, 784)
-x_test = x_test.reshape(10000, 784)
+x_train_flat = x_train.reshape(60000, 784)
+x_test_flat = x_test.reshape(10000, 784)
 
 # One-hot encoding
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+y_train_encoding = to_categorical(y_train)
+y_test_encoding = to_categorical(y_test)
 
 # 建立模型，使用兩層隱藏層
 neuron_num = 500
@@ -29,10 +29,10 @@ model.compile(loss="mse", optimizer=SGD(learning_rate=0.087), metrics=["accuracy
 model.summary()
 
 # 執行模型訓練
-history = model.fit(x_train, y_train, batch_size=100, epochs=20)
+history = model.fit(x_train_flat, y_train_encoding, batch_size=100, epochs=20)
 
 # 印出最終訓練準確率
-scores = model.evaluate(x_test, y_test)
+scores = model.evaluate(x_test_flat, y_test_encoding)
 print("準確率", scores[1])
 
 model.save("handwriting_model.h5")
@@ -42,6 +42,9 @@ plt.figure(figsize=(8, 8))
 plt.plot(history.history["accuracy"], "r", label="訓練準確率")
 # plt.show()
 plt.savefig("accuracy.pdf")
+
+# 預測
+predictions = model.predict_classes(x_test_flat)
 
 
 # model.fit(x_train, y_train, batch_size=10, validation_split=0.2, epochs=20)
