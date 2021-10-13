@@ -1,34 +1,43 @@
 import numpy as np
-from tensorflow.keras.datasets import mnist
+import os
+import cv2
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import load_model
 from show_image import show_image
+from probability2num import probability2num
 
+test_feature = []
+test_label = []
 
-def probability2num(predictions):
-    pre_out = []
-    for prediction in predictions:
-        pre_out.append(np.argmax(prediction))
-    return pre_out
+# 讀取自行準備之圖檔
+file_path = os.path.join(".", "figs")
+file_list = os.listdir(path=file_path)
 
+for file in file_list:
+    test_label.append(int(file.strip(".jpg")))
+    fig = cv2.imread(os.path.join(file_path, file))
+    fig = cv2.resize(fig, dsize=(28, 28))
+    fig = cv2.cvtColor(fig, cv2.COLOR_BGR2GRAY)     # 將圖片轉成灰階
+    test_feature.append(fig)
 
-# mnist = tf.keras.datasets.mnist
-(x_train, y_train), (x_test, y_test) = mnist.load_data()  # 載入 MNIST 手寫數字資料
+num = len(test_label)
+
+# 將清單傳換成陣列
+test_feature = np.abs(255 - np.array(test_feature))  # 順便執行顏色反轉
+test_label = np.array(test_label)
 
 # 將寬高各 28 個像素的圖壓縮成一維陣列
-x_train_flat = x_train.reshape(60000, 784)
-x_test_flat = x_test.reshape(10000, 784)
+test_feature_flat = test_feature.reshape(num, 784)
 
 # One-hot encoding
-y_train_encoding = to_categorical(y_train)
-y_test_encoding = to_categorical(y_test)
+test_label_encoding = to_categorical(test_label)
 
 # 載入訓練完畢之模型
 model = load_model("handwriting_model.h5")
 
 # 預測結果
-predictions = model.predict(x_test_flat)
+predictions = model.predict(test_feature_flat)
 predictions = probability2num(predictions)
 
 # 顯示結果
-show_image(x_test, y_test, predictions, start_id=9, num=10)
+show_image(test_feature, test_label, predictions, start_id=0, num=num)
